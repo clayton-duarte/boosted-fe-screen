@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 import SongCard from "~/components/SongCard";
 import songsData from "~/data/songlist.json";
@@ -17,16 +17,22 @@ export function getStaticProps() {
 }
 
 export default function Home({ songList }: PageProps) {
+  const [currentlyPlaying, setCurrentlyPlaying] = useState<number | null>(null);
+
   return (
-    <div>
-      {songList.songs?.map(({ title, artist, duration }) => (
+    <ul>
+      {songList.songs?.map(({ title, artist, duration }, index) => (
         <SongCard
+          setCurrentlyPlaying={setCurrentlyPlaying}
+          lastSong={songList.songs.length - 1}
+          currentlyPlaying={currentlyPlaying}
           duration={duration}
           artist={artist}
           title={title}
           key={title}
+          id={index}
         />
       ))}
-    </div>
+    </ul>
   );
 }
