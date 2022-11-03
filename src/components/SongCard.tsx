@@ -1,20 +1,21 @@
 import React, { useEffect, useMemo, useState, useRef, Dispatch } from "react";
-import { FiPlay, FiPause, FiSkipBack, FiSkipForward } from "react-icons/fi";
 import { Duration } from "luxon";
 
+import Player from "~/components/Player";
+import Track from "~/components/Track";
 import { Song } from "~/typings";
 
 type SongCardProps = Song & {
   id: number;
   setCurrentlyPlaying: Dispatch<number | null>;
-  currentlyPlaying?: number | null;
-  lastSong: number;
+  currentlyPlaying: number | null;
+  lastSongId: number;
 };
 
 export default function SongCard({
   setCurrentlyPlaying,
   currentlyPlaying,
-  lastSong,
+  lastSongId,
   duration,
   artist,
   title,
@@ -60,52 +61,72 @@ export default function SongCard({
   }, [currentlyPlaying, setCurrentlyPlaying, played, duration]);
 
   return (
-    <li>
+    <li id={`song-${id}`}>
+      <h2>
+        {title} <span>{artist}</span>
+      </h2>
       <div>
-        <button
-          disabled={id === 0}
-          onClick={() => {
-            const prevSongId = id - 1;
-            if (prevSongId >= 0) return setCurrentlyPlaying(prevSongId);
-            return setCurrentlyPlaying(null);
-          }}
-        >
-          <FiSkipBack />
-        </button>
-        {isPlaying ? (
-          <button onClick={() => setCurrentlyPlaying(null)}>
-            <FiPause />
-          </button>
-        ) : (
-          <button onClick={() => setCurrentlyPlaying(id)}>
-            <FiPlay />
-          </button>
-        )}
-        <button
-          disabled={id === lastSong}
-          onClick={() => {
-            const prevSongId = id + 1;
-            if (prevSongId <= lastSong) return setCurrentlyPlaying(prevSongId);
-            return setCurrentlyPlaying(null);
-          }}
-        >
-          <FiSkipForward />
-        </button>
+        <Player
+          setCurrentlyPlaying={setCurrentlyPlaying}
+          currentlyPlaying={currentlyPlaying}
+          lastSongId={lastSongId}
+          songId={id}
+        />
+        <Track setPlayed={setPlayed} duration={duration} played={played} />
+        <code>
+          {formattedPlayed}/{formattedDuration}
+        </code>
       </div>
-      <h2>{title}</h2>
-      <h3>{artist}</h3>
-      <input
-        onChange={(e) => setPlayed(Number(e.target.value))}
-        value={played}
-        max={duration}
-        type="range"
-        id="track"
-        step={1}
-        min={0}
-      />
-      <p>
-        {formattedPlayed}/{formattedDuration}
-      </p>
+      <style jsx>{`
+        li {
+          border-radius: 0.5rem;
+          padding: 1rem 1.5rem;
+          background: #333333;
+          display: grid;
+          width: 100%;
+          gap: 1rem;
+        }
+
+        div {
+          grid-template-columns: auto 1fr auto;
+          align-items: center;
+          display: grid;
+          width: 100%;
+          padding: 0;
+          gap: 1rem;
+          grid-template-areas: "player track duration";
+        }
+
+        h2 {
+          grid-template-columns: auto auto 1fr;
+          align-items: center;
+          font-size: 1.5rem;
+          display: grid;
+          margin: 0;
+          gap: 1rem;
+        }
+
+        span {
+          font-size: 1rem;
+          color: #999999;
+        }
+
+        @media (max-width: 768px) {
+          h2 {
+            grid-template-columns: auto;
+            font-size: 1.25rem;
+            gap: 0.5rem;
+          }
+
+          div {
+            justify-content: space-between;
+            grid-template-columns: auto auto;
+            grid-template-areas:
+              "track track"
+              "player duration";
+          }
+        }
+      `}</style>
     </li>
   );
 }
