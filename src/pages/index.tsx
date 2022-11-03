@@ -1,15 +1,17 @@
 import React from "react";
 
+import SongCard from "~/components/SongCard";
 import songsData from "~/data/songlist.json";
+import { SongList } from "~/typings";
 
 interface PageProps {
-  songList: typeof songsData;
+  songList: SongList;
 }
 
 export function getStaticProps() {
   return {
     props: {
-      songList: songsData.songs,
+      songList: songsData,
     },
   };
 }
@@ -17,12 +19,13 @@ export function getStaticProps() {
 export default function Home({ songList }: PageProps) {
   return (
     <div>
-      {songList.songs.map(({ title, artist, duration }) => (
-        <div key={title}>
-          <h1>{title}</h1>
-          <h2>{artist}</h2>
-          <h3>{duration}</h3>
-        </div>
+      {songList.songs?.map(({ title, artist, duration }) => (
+        <SongCard
+          duration={duration}
+          artist={artist}
+          title={title}
+          key={title}
+        />
       ))}
     </div>
   );
